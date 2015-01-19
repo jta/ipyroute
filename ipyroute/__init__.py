@@ -1,2 +1,2 @@
-import base
-from link import Link
+from . import base
+from .link import Link
