@@ -1,4 +1,14 @@
-""" Base classes for interfacing with iproute2. """
+""" Base c
+
+        def wrapped(*args, **kwargs):
+            args = list(args)
+            for key in ('dev', 'scope', 'to', 'label'):
+                if key in kwargs:
+                    args.extend((key, kwargs.get(key)))
+            return cls.cmd.add(*args)
+        return wrapped
+
+lasses for interfacing with iproute2. """
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
@@ -58,6 +68,7 @@ class classproperty(property):
         return classmethod(self.fget).__get__(instance, cls)()
 
 
+
 class Base(object):
     """ The base class does generic processing of the output of an iproute2
         `show` command. Each subclass should provide a regex on how to
@@ -109,6 +120,24 @@ class Base(object):
         """
         return list(args) + [i for kv in kwargs.items() for i in kv]
 
+    @staticmethod
+    def shwrap(func, order):
+        """ Wraps a shell command so we can unwind the command arguments in
+            the correct order. This won't matter in Python3.5 since kwargs are
+            an ordered dict.
+        """
+        def wrapped(*args, **kwargs):
+            args = list(args)
+            for key in order:
+                if key in kwargs:
+                    args.extend((key, kwargs.pop(key)))
+            # remaining kwargs are unordered
+            for item in kwargs.items():
+                args.extend(*item)
+            return func(*args)
+        return wrapped
+
+
     @classmethod
     def get(cls, *args, **kwargs):
         """ Scrape iproute2 output and return filtered list of matches. """
@@ -117,5 +146,3 @@ class Base(object):
         func = functools.partial(cls._get, *args) if args else cls._get
         iterator = (cls.from_string(l) for l in func())
         return [i for i in iterator if filt(i)]
-
-

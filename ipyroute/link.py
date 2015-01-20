@@ -46,17 +46,23 @@ class Link(base.Base):
     @property
     def add(self):
         """ Add command for link. """
-        return getattr(self.cmd.add.link.dev, self.name)
+        func = getattr(self.cmd.add.link.dev, self.name)
+        order = ('type',  'mode')
+        return self.shwrap(func, order)
 
     @property
     def delete(self):
         """ Delete command for link. """
-        return self.cmd.delete.bake(self.name)
+        func = getattr(self.cmd.delete, self.name)
+        order = ()
+        return self.shwrap(func, order)
 
     @property
     def set(self):
         """ Set command for link. """
-        return self.cmd.set.dev.bake(self.name)
+        func = getattr(self.cmd.set.dev, self.name)
+        order = ()
+        return self.shwrap(func, order)
 
     @classmethod
     def construct(cls, result, _):
