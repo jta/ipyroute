@@ -181,3 +181,36 @@ class TestAddress(unittest.TestCase):
         v4addr, v6addr = ipyroute.Address.get()
         assert v4addr.no_scope
 
+
+class TestNeighbor(unittest.TestCase):
+    """ Test Neighbor lib. """
+    def setUp(self):
+        ipyroute.base.IPR = mock.Mock()
+
+    def tearDown(self):
+        pass
+
+    @mocked("ipv4.neigh.show", "10.11.12.3 dev p6p2 lladdr ff:ff:ff:ff:ff:ff PERMANENT")
+    @mocked("ipv6.neigh.show", "fe80::12f3:11ff:fe2b:7a76 dev vp3p1-from-5 lladdr 10:f3:11:2b:7a:76 router STALE")
+    def test_neighbors(self):
+        """ Parse neighbors. """
+        v4neigh, v6neigh = ipyroute.Neighbor.get()
+
+        assert v4neigh.ipaddr == ipyroute.IPAddress('10.11.12.3')
+        assert v4neigh.ifaddr == ipyroute.EUI('ff:ff:ff:ff:ff:ff')
+        assert v4neigh.ifname == 'p6p2'
+        assert v4neigh.permanent
+        assert v6neigh.ipaddr == ipyroute.IPAddress('fe80::12f3:11ff:fe2b:7a76')
+        assert v6neigh.ifaddr == ipyroute.EUI('10:f3:11:2b:7a:76')
+        assert v6neigh.ifname == 'vp3p1-from-5'
+        assert v6neigh.stale
+        assert not v6neigh.permanent
+
+    def test_replace_neigh(self):
+        """ Replace peer. """
+        ipyroute.Neighbor.replace("172.16.0.1", lladdr='ff:ff:ff:ff:ff:ff', nud='permanent', dev='p3p1')
+        expected = ipyroute.base.IPR.root.neigh.replace
+        assert expected.called
+        assert " ".join(expected.call_args[0]) == '172.16.0.1 lladdr ff:ff:ff:ff:ff:ff nud permanent dev p3p1'
+
+

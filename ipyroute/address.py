@@ -14,6 +14,7 @@ class Address(base.Base):
     casts = dict(ifnum=int, addr=base.IPNetwork, brd=base.IPAddress, peer=base.IPNetwork)
 
     _scopes = set(['host', 'link', 'global'])
+    _order = ('peer', 'dev', 'scope', 'to', 'label')
 
     @classmethod
     def _get(cls, *args):
@@ -41,14 +42,20 @@ class Address(base.Base):
     @base.classproperty
     def add(cls):
         """ Add command for address. """
-        func = cls.cmd.add
-        order = ('peer', 'dev', 'scope', 'to', 'label')
-        return cls.shwrap(func, order)
+        return cls.shwrap(cls.cmd.add, cls._order)
+
+    @base.classproperty
+    def change(cls):
+        """ Change command for address. """
+        return cls.shwrap(cls.cmd.add.change, cls._order)
+
+    @base.classproperty
+    def replace(cls):
+        """ Replace command for address. """
+        return cls.shwrap(cls.cmd.add.replace, cls._order)
 
     @base.classproperty
     def delete(cls):
-        """ Add command for address. """
-        func = getattr(cls.cmd, 'del')
-        order = ('peer', 'dev', 'label')
-        return cls.shwrap(func, order)
+        """ Delete command for address. """
+        return cls.shwrap(getattr(cls.cmd, 'del'), cls._order)
 
