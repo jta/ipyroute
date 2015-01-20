@@ -173,3 +173,11 @@ class TestAddress(unittest.TestCase):
         assert expected.called
         assert " ".join(expected.call_args[0]) == '172.16.0.1/32 peer 172.17.0.1/32 dev p3p1'
 
+    @raises(AttributeError)
+    @mocked("ipv4.addr.show", "11: p6p1    inet 172.235.34.20 peer 172.242.148.197/32 scope global p6p1:label\       valid_lft forever preferred_lft forever")
+    @mocked("ipv6.addr.show", "11: p6p1    inet6 fe80::40:ff:fe20:601/64 scope link \       valid_lft forever preferred_lft forever")
+    def test_bogus_scope(self):
+        """ Parse peer IP address. """
+        v4addr, v6addr = ipyroute.Address.get()
+        assert v4addr.no_scope
+

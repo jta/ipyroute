@@ -146,3 +146,8 @@ class Base(object):
         func = functools.partial(cls._get, *args) if args else cls._get
         iterator = (cls.from_string(l) for l in func())
         return [i for i in iterator if filt(i)]
+
+    def __getattr__(self, name):
+        """ Check for missing attributes. Override in subclass. """
+        errmsg = "type object {0.__class__!r} has no attribute {1!r}"
+        raise AttributeError(errmsg.format(self, name))

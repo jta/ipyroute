@@ -34,8 +34,7 @@ class Link(base.Base):
     def __getattr__(self, name):
         if name.upper() in self._validflags:
             return name.upper() in self.flags
-        errmsg = "type object {0.__class__!r} has no attribute {1!r}"
-        raise AttributeError(errmsg.format(self, name))
+        super(Link, self).__getattr__(name)
 
     @base.classproperty
     def cmd(cls):

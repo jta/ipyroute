@@ -1,4 +1,3 @@
-import functools
 import re
 from ipyroute import base
 
@@ -31,9 +30,7 @@ class Address(base.Base):
                 return scope == self.scope
         except ValueError:
             pass
-
-        errmsg = "type object {0.__class__!r} has no attribute {1!r}"
-        raise AttributeError(errmsg.format(self, name))
+        super(Address, self).__getattr__(name)
 
     @base.classproperty
     def cmd(cls):
