@@ -45,10 +45,9 @@ class TestLink(unittest.TestCase):
         pass
 
     @mocked("link.addr.show",
-            "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN "
-            "\   link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00")
+            "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN \   link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00")
     def test_loopback_link(self):
-        """ Get links. """
+        """ Parse loopback link. """
         link = Link.get().pop()
         assert link.name == "lo"
         assert link.loopback
@@ -58,10 +57,9 @@ class TestLink(unittest.TestCase):
         assert not link.broadcast
 
     @mocked("link.addr.show",
-            "2: bond0: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noop "
-            "state DOWN \    link/ether 82:e1:10:2e:d2:bf brd ff:ff:ff:ff:ff:ff")
+            "2: bond0: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noop state DOWN \    link/ether 82:e1:10:2e:d2:bf brd ff:ff:ff:ff:ff:ff")
     def test_bond_link(self):
-        """ Get links. """
+        """ Parse bond link. """
         link = Link.get().pop()
         assert link.name == "bond0"
         assert link.broadcast
@@ -70,35 +68,33 @@ class TestLink(unittest.TestCase):
         assert link.mtu == 1500
         assert link.qdisc == 'noop'
         assert link.type == 'ether'
-        assert link.addr == '82:e1:10:2e:d2:bf'
+        assert link.addr == base.EUI('82:e1:10:2e:d2:bf')
 
     @mocked("link.addr.show",
-            "3: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN "
-            "\    link/ether c2:9a:cc:30:2c:67 brd ff:ff:ff:ff:ff:ff")
+            "3: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN \    link/ether c2:9a:cc:30:2c:67 brd ff:ff:ff:ff:ff:ff")
     def test_dummy_link(self):
-        """ Get links. """
+        """ Parse dummy link. """
         link = Link.get().pop()
         assert link.name == "dummy0"
         assert link.broadcast
         assert link.noarp
         assert not link.master
         assert link.mtu == 1500
-        assert link.addr == 'c2:9a:cc:30:2c:67'
-        assert link.brd == 'ff:ff:ff:ff:ff:ff'
+        assert link.addr == base.EUI('c2:9a:cc:30:2c:67')
+        assert link.brd == base.EUI('ff:ff:ff:ff:ff:ff')
 
     @mocked("link.addr.show",
-            "5: gre0@NONE: <NOARP> mtu 1476 qdisc noop state DOWN "
-            "\    link/gre 0.0.0.0 brd 0.0.0.0")
+            "5: gre0@NONE: <NOARP> mtu 1476 qdisc noop state DOWN \    link/gre 0.0.0.0 brd 0.0.0.0")
     def test_gre_link(self):
-        """ Get links. """
+        """ Parse GRE link. """
         link = Link.get().pop()
         assert link.name == "gre0"
         assert link.phy == "NONE"
         assert not link.broadcast
         assert link.noarp
         assert link.mtu == 1476
-        assert link.addr == '0.0.0.0'
-        assert link.brd == '0.0.0.0'
+        assert link.addr == base.IPAddress('0.0.0.0')
+        assert link.brd == base.IPAddress('0.0.0.0')
 
     # XXX: generic?
     @raises(ValueError)
@@ -110,17 +106,14 @@ class TestLink(unittest.TestCase):
     # XXX: generic? ValueError or TypeError?
     @raises(ValueError)
     @mocked("link.addr.show",
-            "5: gre0@NONE: <NOARP> mtu bogus qdisc noop state "
-            "DOWN \    link/gre 0.0.0.0 brd 0.0.0.0")
+            "5: gre0@NONE: <NOARP> mtu WRONG qdisc noop state DOWN \    link/gre 0.0.0.0 brd 0.0.0.0")
     def test_wrong_type_int(self):
-        """ ValueError should be raised when field has wrong type. """
+        """ ValueError should be raised when field has wrong type (mtu must be int). """
         Link.get()
 
     @mocked("link.addr.show",
-            "8: p3p1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 "
-            "qdisc mq state UP qlen 1000\    link/ether "
-            "02:40:00:20:03:01 brd ff:ff:ff:ff:ff:ff")
-    def test_set_link(self):
+            "8: p3p1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP qlen 1000\    link/ether 02:40:00:20:03:01 brd ff:ff:ff:ff:ff:ff")
+    def test_add_veth(self):
         """ Confirm correct args get passed when adding a virtual link. """
         link = Link.get().pop()
         callargs = 'vethp3p1 type macvlan mode private'

@@ -4,11 +4,12 @@ from __future__ import print_function
 
 import functools
 import netaddr
-from netaddr import IPAddress, IPNetwork
 import re
 import sys
 
 EUI = functools.partial(netaddr.EUI, dialect=netaddr.mac_unix_expanded)
+IPAddress = netaddr.IPAddress
+IPNetwork = netaddr.IPNetwork
 
 class IPRouteMeta(type):
     """ This is a relatively dense way of only requiring iproute2 at runtime.
@@ -25,9 +26,12 @@ class IPRouteMeta(type):
 
         if cls._ipr is None:
             try:
+                # pylint: disable=no-name-in-module
                 from sh import ip
             except ImportError:
                 sys.exit("ERROR: iproute2 not found.")
+
+            # pylint: disable=attribute-defined-outside-init
             cls._ipr = ip.bake('-o')
             cls.root = cls._ipr
             cls.link = cls.root.bake('-0')
@@ -38,15 +42,18 @@ class IPRouteMeta(type):
 
 class IPR(object):
     """ This is a dummy proxy class for interfacing with iproute2. """
+    # pylint: disable=too-few-public-methods
     __metaclass__ = IPRouteMeta
     _ipr = None
 
 
+# pylint: disable=invalid-name
 class classproperty(property):
     """ A hack to do classmethod properties. Normally you'd just use class attributes,
         but in this case we want to do lazy evaluation of the IPR object for interfacing
         with iproute2.
     """
+    # pylint: disable=too-few-public-methods
     def __get__(self, instance, cls):
         return classmethod(self.fget).__get__(instance, cls)()
 
@@ -85,15 +92,14 @@ class Base(object):
             msg = "No match found for {!r}: {!r}".format(cls, ipstr)
             raise ValueError(msg)
         result = match.groupdict()
-        result = cls.recurse(result, ipstr)
-        return cls(**result)
+        return cls.construct(result, ipstr)
 
     @classmethod
-    def recurse(cls, result, ipstr):
+    def construct(cls, result, _):
         """ If we need additional parsing, do it here.
             By omission do nothing.
         """
-        return result
+        return cls(**result)
 
     @staticmethod
     def _unwind(*args, **kwargs):
