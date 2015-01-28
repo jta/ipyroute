@@ -222,3 +222,43 @@ class TestNeighbor(unittest.TestCase):
         assert " ".join(expected.call_args[0]) == '172.16.0.1 lladdr ff:ff:ff:ff:ff:ff nud permanent dev p3p1'
 
 
+class TestRule(unittest.TestCase):
+    """ Test rule lib. """
+    def setUp(self):
+        ipyroute.base.IPR = mock.Mock()
+
+    def tearDown(self):
+        pass
+
+    @mocked("ipv4.rule.show", "0:      from all lookup local")
+    @mocked("ipv6.rule.show", "32766:  from all lookup main")
+    def test_rule_list(self):
+        """ Parse neighbors. """
+        v4rule, = ipyroute.Rule4.get()
+        assert v4rule.pref == 0
+        assert v4rule.lookup == 'local'
+        assert v4rule.fromprefix == ipyroute.IPNetwork('0.0.0.0/0')
+
+        v6rule, = ipyroute.Rule6.get()
+        assert v6rule.pref == 32766
+        assert v6rule.lookup == 'main'
+        assert v6rule.fromprefix == ipyroute.IPNetwork('::/0')
+
+    @mocked("ipv4.rule.show", "0:      from all lookup local")
+    def test_del_rule(self):
+        """ Confirm correct args get passed when adding a virtual link. """
+        rule = ipyroute.Rule4.get().pop()
+        rule.delete()
+
+        expected = getattr(ipyroute.base.IPR.ipv4.rule, 'del')
+        assert expected.called
+        assert " ".join(expected.call_args[0]) == 'from 0.0.0.0/0 lookup local pref 0'
+
+    def test_add_rule(self):
+        """ Confirm correct args get passed when adding a virtual link. """
+        ipyroute.Rule6.add('any', fwmark=5, lookup='local', pref=10)
+        expected = ipyroute.base.IPR.ipv6.rule.add
+        assert expected.called
+        assert " ".join(str(i) for i in expected.call_args[0]) == 'from ::/0 fwmark 5 lookup local pref 10'
+
+

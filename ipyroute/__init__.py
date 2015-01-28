@@ -2,6 +2,7 @@
 from . import base
 from .base import EUI, IPAddress, IPNetwork
 
-from .link import Link
 from .address import Address
+from .link import Link
 from .neighbor import Neighbor
+from .rule import Rule4, Rule6
