@@ -102,7 +102,7 @@ class Base(object):
         """ If we need additional parsing, do it here.
             By omission do nothing.
         """
-        return cls(*args, **result)
+        return cls(**result)
 
     @staticmethod
     def _unwind(*args, **kwargs):
