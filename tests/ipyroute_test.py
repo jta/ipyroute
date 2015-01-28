@@ -28,7 +28,7 @@ class TestLink(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @mocked("link.addr.show",
+    @mocked("link.link.show",
             "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN \   link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00")
     def test_loopback_link(self):
         """ Parse loopback link. """
@@ -40,7 +40,7 @@ class TestLink(unittest.TestCase):
         assert link.mtu == 65536
         assert not link.broadcast
 
-    @mocked("link.addr.show",
+    @mocked("link.link.show",
             "2: bond0: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noop state DOWN \    link/ether 82:e1:10:2e:d2:bf brd ff:ff:ff:ff:ff:ff")
     def test_bond_link(self):
         """ Parse bond link. """
@@ -54,7 +54,7 @@ class TestLink(unittest.TestCase):
         assert link.type == 'ether'
         assert link.addr == ipyroute.EUI('82:e1:10:2e:d2:bf')
 
-    @mocked("link.addr.show",
+    @mocked("link.link.show",
             "3: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN \    link/ether c2:9a:cc:30:2c:67 brd ff:ff:ff:ff:ff:ff")
     def test_dummy_link(self):
         """ Parse dummy link. """
@@ -67,7 +67,7 @@ class TestLink(unittest.TestCase):
         assert link.addr == ipyroute.EUI('c2:9a:cc:30:2c:67')
         assert link.brd == ipyroute.EUI('ff:ff:ff:ff:ff:ff')
 
-    @mocked("link.addr.show",
+    @mocked("link.link.show",
             "5: gre0@NONE: <NOARP> mtu 1476 qdisc noop state DOWN \    link/gre 0.0.0.0 brd 0.0.0.0")
     def test_gre_link(self):
         """ Parse GRE link. """
@@ -82,20 +82,20 @@ class TestLink(unittest.TestCase):
 
     # XXX: generic?
     @raises(ValueError)
-    @mocked("link.addr.show", "\n")
+    @mocked("link.link.show", "\n")
     def test_unmatched_line(self):
         """ If no regex match is found, value error should be raised. """
         ipyroute.Link.get()
 
     # XXX: generic? ValueError or TypeError?
     @raises(ValueError)
-    @mocked("link.addr.show",
+    @mocked("link.link.show",
             "5: gre0@NONE: <NOARP> mtu WRONG qdisc noop state DOWN \    link/gre 0.0.0.0 brd 0.0.0.0")
     def test_wrong_type_int(self):
         """ ValueError should be raised when field has wrong type (mtu must be int). """
         ipyroute.Link.get()
 
-    @mocked("link.addr.show",
+    @mocked("link.link.show",
             "8: p3p1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP qlen 1000\    link/ether 02:40:00:20:03:01 brd ff:ff:ff:ff:ff:ff")
     def test_add_veth(self):
         """ Confirm correct args get passed when adding a virtual link. """
