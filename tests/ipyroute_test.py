@@ -102,7 +102,7 @@ class TestLink(unittest.TestCase):
         link = ipyroute.Link.get().pop()
         link.add('vethp3p1', type='macvlan', mode='private')
 
-        expected = ipyroute.base.IPR.root.link.add.link.dev.p3p1
+        expected = ipyroute.base.IPR.root.link.add.link.p3p1.dev
         assert expected.called
         assert " ".join(expected.call_args[0]) == 'vethp3p1 type macvlan mode private'
 

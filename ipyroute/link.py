@@ -48,9 +48,9 @@ class Link(base.Base):
     @property
     def add(self):
         """ Add command for link. """
-        func = getattr(self.cmd.add.link.dev, self.name)
+        func = getattr(self.cmd.add.link, self.name)
         order = ('type',  'mode')
-        return self.shwrap(func, order)
+        return self.shwrap(func.dev, order)
 
     @property
     def delete(self):
