@@ -133,7 +133,7 @@ class Base(object):
                     args.extend((key, kwargs.pop(key)))
             # remaining kwargs are unordered
             for item in kwargs.items():
-                args.extend(*item)
+                args.extend(item)
             return func(*args)
         return wrapped
 

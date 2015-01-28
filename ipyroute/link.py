@@ -29,7 +29,7 @@ class Link(base.Base):
     def _get(cls, *args):
         # We load link in IPR class at runtime.
         # pylint: disable=no-member
-        return base.IPR.link.addr.show(*args)
+        return cls.link.show(*args)
 
     def __getattr__(self, name):
         if name.upper() in self._validflags:
