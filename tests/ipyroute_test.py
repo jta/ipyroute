@@ -246,7 +246,7 @@ class TestRule(unittest.TestCase):
 
     @mocked("ipv4.rule.show", "0:      from all lookup local")
     def test_del_rule(self):
-        """ Confirm correct args get passed when adding a virtual link. """
+        """ Confirm rule deletion syntax. """
         rule = ipyroute.Rule4.get().pop()
         rule.delete()
 
@@ -255,10 +255,16 @@ class TestRule(unittest.TestCase):
         assert " ".join(expected.call_args[0]) == 'from 0.0.0.0/0 lookup local pref 0'
 
     def test_add_rule(self):
-        """ Confirm correct args get passed when adding a virtual link. """
+        """ Confirm rule addition syntax. """
         ipyroute.Rule6.add('any', fwmark=5, lookup='local', pref=10)
         expected = ipyroute.base.IPR.ipv6.rule.add
         assert expected.called
         assert " ".join(str(i) for i in expected.call_args[0]) == 'from ::/0 fwmark 5 lookup local pref 10'
+
+    @mocked("ipv4.rule.show", "107:    from all fwmark 0x7 lookup 107")
+    def test_fwmark(self):
+        """ Assert fwmarks get translated to integers. """
+        rule = ipyroute.Rule4.get().pop()
+        assert rule.fwmark == 7
 
 

@@ -9,7 +9,10 @@ class Rule(base.Base):
                        r'(fwmark (?P<fwmark>\w+)\s+)?'
                        r'(lookup (?P<lookup>\w+))?')
 
-    casts = dict(pref=int, fromprefix=base.IPNetwork, toprefix=base.IPNetwork)
+    casts = dict(pref=int,
+                 fwmark=lambda x: int(x, 16),
+                 fromprefix=base.IPNetwork,
+                 toprefix=base.IPNetwork)
     _order = ('from', 'fwmark', 'lookup', 'pref')
 
     @classmethod
