@@ -1,14 +1,4 @@
-""" Base c
-
-        def wrapped(*args, **kwargs):
-            args = list(args)
-            for key in ('dev', 'scope', 'to', 'label'):
-                if key in kwargs:
-                    args.extend((key, kwargs.get(key)))
-            return cls.cmd.add(*args)
-        return wrapped
-
-lasses for interfacing with iproute2. """
+""" Base classes for interfacing with iproute2. """
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 

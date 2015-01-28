@@ -35,6 +35,9 @@ class Link(base.Base):
             return []
 
     def __getattr__(self, name):
+        if name == 'group':
+            return None
+
         if name.upper() in self._validflags:
             return name.upper() in self.flags
         super(Link, self).__getattr__(name)
@@ -69,7 +72,7 @@ class Link(base.Base):
     @classmethod
     def construct(cls, result, _, *args):
         _cls = cls
-        if args:
+        if 'group' in args:
             idx = args.index('group')
             result['group'] = args[idx+1]
         linktype = result.get('type', None)
