@@ -17,6 +17,8 @@ import netaddr
 import re
 import sys
 
+from sh import ErrorReturnCode
+
 EUI = functools.partial(netaddr.EUI, dialect=netaddr.mac_unix_expanded)
 IPAddress = netaddr.IPAddress
 IPNetwork = netaddr.IPNetwork
