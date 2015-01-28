@@ -67,8 +67,11 @@ class Link(base.Base):
         return self.shwrap(func, order)
 
     @classmethod
-    def construct(cls, result, _):
+    def construct(cls, result, _, *args):
         _cls = cls
+        if args:
+            idx = args.index('group')
+            result['group'] = args[idx+1]
         linktype = result.get('type', None)
         if linktype == 'ether':
             _cls = EtherLink

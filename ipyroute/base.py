@@ -96,8 +96,8 @@ class Base(object):
         raise NotImplementedError
 
     @classmethod
-    def from_string(cls, ipstr):
-        """ Every line of output fed by _get() should be converted into an object
+    def from_string(cls, ipstr, *args):
+        """ Every line of output fed by _get(*args) should be converted into an object
             in this method, which may be subclassed if necessary.
         """
         match = cls.regex.match(ipstr)
@@ -105,14 +105,14 @@ class Base(object):
             msg = "No match found for {!r}: {!r}".format(cls, ipstr)
             raise ValueError(msg)
         result = match.groupdict()
-        return cls.construct(result, ipstr)
+        return cls.construct(result, ipstr, *args)
 
     @classmethod
-    def construct(cls, result, _):
+    def construct(cls, result, ipstr, *args):
         """ If we need additional parsing, do it here.
             By omission do nothing.
         """
-        return cls(**result)
+        return cls(*args, **result)
 
     @staticmethod
     def _unwind(*args, **kwargs):
@@ -146,7 +146,7 @@ class Base(object):
         filt = kwargs.pop('filt', lambda x: True)
         args = cls._unwind(*args, **kwargs)
         func = functools.partial(cls._get, *args) if args else cls._get
-        iterator = (cls.from_string(l) for l in func())
+        iterator = (cls.from_string(l, *args) for l in func())
         return [i for i in iterator if filt(i)]
 
     def __getattr__(self, name):

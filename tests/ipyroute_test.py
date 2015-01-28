@@ -106,6 +106,14 @@ class TestLink(unittest.TestCase):
         assert expected.called
         assert " ".join(expected.call_args[0]) == 'vethp3p1 type macvlan mode private'
 
+    @mocked("link.link.show",
+            "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN \   link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00")
+    def test_link_group(self):
+        """ Parse link for specific link group. """
+        link = ipyroute.Link.get(group='test').pop()
+        assert link.group == 'test'
+
+
 
 class TestAddress(unittest.TestCase):
     """ Test Address lib. """
