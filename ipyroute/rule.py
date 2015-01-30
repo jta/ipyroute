@@ -10,7 +10,7 @@ class Rule(base.Base):
                        r'(lookup (?P<lookup>\w+))?')
 
     casts = dict(pref=int,
-                 fwmark=lambda x: int(x, 16),
+                 fwmark=lambda x: int(x, 16) if 'x' in x else int(x),
                  fromprefix=base.IPNetwork,
                  toprefix=base.IPNetwork)
     _order = ('from', 'fwmark', 'lookup', 'pref')
@@ -23,7 +23,7 @@ class Rule(base.Base):
     @classmethod
     def add(cls, fromprefix, **kwargs):
         """ Add command for address. """
-        kwargs['from'] = cls._allprefix if fromprefix == 'any' else str(fromprefix)
+        kwargs['from'] = cls.anyaddr if fromprefix == 'any' else str(fromprefix)
         return cls.shwrap(cls.cmd.add, cls._order)(**kwargs)
 
     def delete(self):
@@ -36,11 +36,15 @@ class Rule(base.Base):
     def construct(cls, result, _, *args):
         fromprefix = result.get('fromprefix')
         if fromprefix == 'all':
-            result['fromprefix'] = cls._allprefix
+            result['fromprefix'] = cls.anyaddr
         return cls(**result)
 
+    def __hash__(self):
+        """ Needed for constructing rule sets. """
+        return self.pref
+
 class Rule4(Rule):
-    _allprefix = "0.0.0.0/0"
+    anyaddr = "0.0.0.0/0"
 
     @base.classproperty
     def cmd(cls, *args):
@@ -48,7 +52,7 @@ class Rule4(Rule):
         return base.IPR.ipv4.rule
 
 class Rule6(Rule):
-    _allprefix = "::/0"
+    anyaddr = "::/0"
 
     @base.classproperty
     def cmd(cls, *args):

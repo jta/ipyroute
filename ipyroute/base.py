@@ -144,7 +144,10 @@ class Base(object):
         errmsg = "type object {0.__class__!r} has no attribute {1!r}"
         raise AttributeError(errmsg.format(self, name))
 
+    def __str__(self):
+        return str(dict((k, v) for k, v in self.__dict__.items() if v is not None))
+
     def __eq__(self, other):
         if not other:
             return False
-        return self.__dict__ == other.__dict__
+        return self.__str__() == other.__str__()
