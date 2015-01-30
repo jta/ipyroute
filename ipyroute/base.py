@@ -143,3 +143,8 @@ class Base(object):
         """ Check for missing attributes. Override in subclass. """
         errmsg = "type object {0.__class__!r} has no attribute {1!r}"
         raise AttributeError(errmsg.format(self, name))
+
+    def __eq__(self, other):
+        if not other:
+            return False
+        return self.__dict__ == other.__dict__
