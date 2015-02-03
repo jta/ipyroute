@@ -1,5 +1,6 @@
 """ Lookup rules """
 import re
+import six
 from ipyroute import base
 
 class Rule(base.Base):
@@ -10,7 +11,7 @@ class Rule(base.Base):
                        r'(lookup (?P<lookup>\w+))?')
 
     casts = dict(pref=int,
-                 fwmark=lambda x: int(x, 16) if 'x' in x else int(x),
+                 fwmark=lambda x: int(x, 16) if isinstance(x, six.string_types) and 'x' in x else int(x),
                  fromprefix=base.IPNetwork,
                  toprefix=base.IPNetwork)
     _order = ('from', 'fwmark', 'lookup', 'pref')
