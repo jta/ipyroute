@@ -122,7 +122,13 @@ class Base(object):
             args = list(args)
             for key in order:
                 if key in kwargs:
-                    args.extend((key, kwargs.pop(key)))
+                    if key:
+                        args.append(key)
+                    value = kwargs.pop(key)
+                    if isinstance(value, (list, tuple)):
+                        args.extend(value)
+                    else:
+                        args.append(value)
             # remaining kwargs are unordered
             for item in kwargs.items():
                 args.extend(item)
@@ -145,7 +151,7 @@ class Base(object):
         raise AttributeError(errmsg.format(self, name))
 
     def __str__(self):
-        return str(dict((k, v) for k, v in self.__dict__.items() if v is not None))
+        return str(dict((k, v) for k, v in sorted(self.__dict__.items()) if v is not None))
 
     def __eq__(self, other):
         if not other:

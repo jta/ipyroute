@@ -222,6 +222,31 @@ class TestNeighbor(unittest.TestCase):
         assert " ".join(expected.call_args[0]) == '172.16.0.1 lladdr ff:ff:ff:ff:ff:ff nud permanent dev p3p1'
 
 
+class TestRoute(unittest.TestCase):
+    """ Test Route lib. """
+    def setUp(self):
+        ipyroute.base.IPR = mock.Mock()
+
+    def tearDown(self):
+        pass
+
+    @mocked("ipv4.route.show", "default  proto bird  src 23.235.34.27 \ nexthop via 172.16.56.4  dev p6p1 weight 1\     nexthop via 172.16.57.4  dev p1p3 weight 1")
+    @mocked("ipv6.route.show", "fe80::/64 dev p1p4  proto kernel  metric 256")
+    def test_default(self):
+        """ Parse neighbors. """
+        v4route, = ipyroute.Route4.get()
+        assert v4route.network == ipyroute.IPNetwork('0.0.0.0/0')
+        assert v4route.proto == "bird"
+        assert v4route.src == ipyroute.IPAddress('23.235.34.27')
+        nexthops = [(n.via, n.dev) for n in v4route.nexthops]
+        assert nexthops == [(ipyroute.IPAddress('172.16.56.4'), 'p6p1'), (ipyroute.IPAddress('172.16.57.4'), 'p1p3')]
+
+        v6route, = ipyroute.Route6.get()
+        assert v6route.network == ipyroute.IPNetwork('fe80::/64')
+        assert v6route.dev == 'p1p4'
+        assert v6route.metric == 256
+
+
 class TestRule(unittest.TestCase):
     """ Test rule lib. """
     def setUp(self):
