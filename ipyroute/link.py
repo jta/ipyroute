@@ -14,6 +14,8 @@ class Link(base.Base):
                        r'(mtu (?P<mtu>\d+)\s*)?'
                        r'(qdisc (?P<qdisc>\S+)\s*)?'
                        r'(state (?P<state>\S+)\s*)?'
+                       r'(mode (?P<mode>\S+)\s*)?'
+                       r'(group (?P<group>\S+)\s*)?'
                        r'(qlen (?P<qlen>\S+)\s*)?'
                        r'\\\s+link/(?P<type>\S+) '
                        r'(?P<addr>[a-f\d.:]+) '

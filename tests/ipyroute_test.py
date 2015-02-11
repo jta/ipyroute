@@ -107,6 +107,14 @@ class TestLink(unittest.TestCase):
         assert " ".join(expected.call_args[0]) == 'vethp3p1 type macvlan mode private'
 
     @mocked("link.link.show",
+            "8: vp6p1-primary@p6p1: <BROADCAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group 8 \    link/ether 03:03:03:00:03:03 brd 00:00:00:00:00:00")
+    def test_ss150210(self):
+        """ Parse more recent representation. """
+        link = ipyroute.Link.get().pop()
+        assert link.group == '8'
+        assert link.mode == 'DEFAULT'
+
+    @mocked("link.link.show",
             "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN \   link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00")
     def test_link_group(self):
         """ Parse link for specific link group. """
@@ -188,7 +196,6 @@ class TestAddress(unittest.TestCase):
         """ Parse peer IP address. """
         v4addr, v6addr = ipyroute.Address.get()
         assert v4addr.no_scope
-
 
 class TestNeighbor(unittest.TestCase):
     """ Test Neighbor lib. """
