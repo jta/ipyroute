@@ -12,7 +12,9 @@ class Address(base.Base):
                        r'scope (?P<scope>\S+) '
                        r'(?P=ifname)?((:(?P<label>\S+)))?\\')
 
-    casts = dict(ifnum=int, ifname=six.u, label=six.u,
+    casts = dict(ifnum=int,
+                 ifname=unicode if not six.PY3 else lambda x: x,
+                 label=unicode if not six.PY3 else lambda x: x,
                  addr=base.IPNetwork, brd=base.IPAddress, peer=base.IPNetwork)
 
     _scopes = set(['host', 'link', 'global'])

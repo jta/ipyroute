@@ -12,7 +12,7 @@ class Rule(base.Base):
 
     casts = dict(pref=int,
                  fwmark=lambda x: int(x, 16) if isinstance(x, six.string_types) and 'x' in x else int(x),
-                 lookup=six.u,
+                 lookup=unicode if not six.PY3 else lambda x: x,
                  fromprefix=base.IPNetwork,
                  toprefix=base.IPNetwork)
     _order = ('from', 'fwmark', 'lookup', 'pref')

@@ -8,7 +8,9 @@ class Nexthop(base.Base):
     regex = re.compile(r'nexthop via (?P<via>\S+)\s+'
                        r'dev (?P<dev>\S+) '
                        r'weight (?P<weight>\d+)')
-    casts = dict(via=base.IPAddress, dev=six.u, weight=int)
+    casts = dict(via=base.IPAddress,
+                 dev=unicode if not six.PY3 else lambda x: x,
+                 weight=int)
 
 
 class Route(base.Base):
