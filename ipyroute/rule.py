@@ -22,11 +22,11 @@ class Rule(base.Base):
         for line in cls.cmd.show(*args):
             yield line
 
-    @classmethod
-    def add(cls, fromprefix, **kwargs):
+    def add(self):
         """ Add command for address. """
-        kwargs['from'] = cls.anyaddr if fromprefix == 'any' else str(fromprefix)
-        return cls.shwrap(cls.cmd.add, cls._order)(**kwargs)
+        kwargs = dict([(k.replace('prefix', ''), str(v))
+                      for (k, v) in self.__dict__.items() if v is not None])
+        return self.shwrap(self.cmd.add, self._order)(**kwargs)
 
     def delete(self):
         """ Delete command for rule. """
