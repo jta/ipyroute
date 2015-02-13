@@ -10,7 +10,8 @@ class Address(base.Base):
                        r'(brd (?P<brd>\S+))?\s?'
                        r'(peer (?P<peer>\S+))?\s?'
                        r'scope (?P<scope>\S+) '
-                       r'(?P=ifname)?((:(?P<label>\S+)))?\\')
+                       r'(?P=ifname)?((:(?P<label>[^\\]+)))?')
+
 
     casts = dict(ifnum=int,
                  ifname=unicode if not six.PY3 else lambda x: x,

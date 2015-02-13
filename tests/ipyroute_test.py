@@ -154,7 +154,7 @@ class TestAddress(unittest.TestCase):
         assert v6addr.host_scope
 
     @mocked("ipv4.addr.show", "11: p6p1    inet 172.235.34.20 peer 172.242.148.197/32 scope global p6p1:label\       valid_lft forever preferred_lft forever")
-    @mocked("ipv6.addr.show", "11: p6p1    inet6 fe80::40:ff:fe20:601/64 scope link \       valid_lft forever preferred_lft forever")
+    @mocked("ipv6.addr.show", "9: p1p3    inet6 2620:11a:c000:2:40:ff:fe27:301/64 scope global dynamic \       valid_lft 2534671sec preferred_lft 547471sec")
     def test_peer_address(self):
         """ Parse peer IP address. """
         v4addr, v6addr = ipyroute.Address.get()
@@ -167,10 +167,10 @@ class TestAddress(unittest.TestCase):
         assert v4addr.brd is None
         assert v4addr.global_scope
 
-        assert v6addr.addr == ipyroute.IPNetwork("fe80::40:ff:fe20:601/64")
+        assert v6addr.addr == ipyroute.IPNetwork("2620:11a:c000:2:40:ff:fe27:301")
         assert v6addr.label is None
-        assert v6addr.ifname == "p6p1"
-        assert v6addr.ifnum == 11
+        assert v6addr.ifname == "p1p3"
+        assert v6addr.ifnum == 9
         assert v6addr.peer is None
         assert v6addr.brd is None
         assert v6addr.link_scope
