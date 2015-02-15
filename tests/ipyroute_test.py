@@ -221,6 +221,24 @@ class TestNeighbor(unittest.TestCase):
         assert v6neigh.stale
         assert not v6neigh.permanent
 
+
+    @mocked("ipv4.neigh.show", "10.11.12.3 lladdr ff:ff:ff:ff:ff:ff PERMANENT")
+    @mocked("ipv6.neigh.show", "fe80::12f3:11ff:fe2b:7a77 lladdr 10:f3:11:2b:7a:77 router STALE")
+    def test_neighbors_missing_dev(self):
+        """ ip neigh show dev <ifname> ends up not outputting any device name. """
+        v4neigh, v6neigh = ipyroute.Neighbor.get()
+        assert v4neigh.ipaddr == ipyroute.IPAddress('10.11.12.3')
+        assert v4neigh.ifaddr == ipyroute.EUI('ff:ff:ff:ff:ff:ff')
+        assert v4neigh.ifname == None
+        assert v4neigh.permanent
+        assert v6neigh.ipaddr == ipyroute.IPAddress('fe80::12f3:11ff:fe2b:7a77')
+        assert v6neigh.ifaddr == ipyroute.EUI('10:f3:11:2b:7a:77')
+        assert v6neigh.ifname == None
+        assert v6neigh.stale
+        assert not v6neigh.permanent
+
+
+
     def test_replace_neigh(self):
         """ Replace peer. """
         ipyroute.Neighbor.replace("172.16.0.1", lladdr='ff:ff:ff:ff:ff:ff', nud='permanent', dev='p3p1')

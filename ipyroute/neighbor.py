@@ -5,8 +5,8 @@ from ipyroute import base
 
 class Neighbor(base.Base):
     regex = re.compile(r'(?P<ipaddr>[0-9a-f.:]+) '
-                        'dev (?P<ifname>\S+) '
-                        'lladdr (?P<ifaddr>[0-9a-f.:]+) '
+                        '(dev (?P<ifname>\S+)\s+)?'
+                        '(lladdr (?P<ifaddr>[0-9a-f.:]+)\s+)?'
                         '(router)?\s*(?P<nud>\S+)')
 
     casts = dict(ipaddr=base.IPAddress, ifaddr=base.EUI)
