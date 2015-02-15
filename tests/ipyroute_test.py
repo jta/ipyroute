@@ -288,7 +288,7 @@ class TestRule(unittest.TestCase):
 
     def test_add_rule(self):
         """ Confirm rule addition syntax. """
-        rule = ipyroute.Rule6(fromprefix=ipyroute.Rule6.anyaddr, fwmark=5, lookup=u'local', pref=10)
+        rule = ipyroute.Rule6(fromprefix=ipyroute.Rule6.anyaddr, fwmark=5, lookup='local', pref=10)
         rule.add()
         expected = ipyroute.base.IPR.ipv6.rule.add
         assert expected.called

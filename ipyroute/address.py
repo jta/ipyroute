@@ -47,24 +47,24 @@ class Address(base.Base):
     @base.classproperty
     def add(cls):
         """ Add command for address. """
-        cls.cache.reset()
+        cls.cache.clear()
         return cls.shwrap(cls.cmd.add, cls._order)
 
     @base.classproperty
     def change(cls):
         """ Change command for address. """
-        cls.cache.reset()
+        cls.cache.clear()
         return cls.shwrap(cls.cmd.add.change, cls._order)
 
     @base.classproperty
     def replace(cls):
         """ Replace command for address. """
-        cls.cache.reset()
+        cls.cache.clear()
         return cls.shwrap(cls.cmd.add.replace, cls._order)
 
     @base.classproperty
     def delete(cls):
         """ Delete command for address. """
-        cls.cache.reset()
+        cls.cache.clear()
         return cls.shwrap(getattr(cls.cmd, 'del'), cls._order)
 

@@ -36,14 +36,14 @@ class Route(base.Base):
 
     @base.classproperty
     def flush(cls):
-        cls.cache.reset()
+        cls.cache.clear()
         return cls.shwrap(cls.cmd.flush, ('table', 'label'))
 
 
     @classmethod
     def add(cls, network, **kwargs):
         """ Add command for route. """
-        cls.cache.reset()
+        cls.cache.clear()
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
         func = cls.shwrap(cls.cmd.add, ('table', 'src', ''))
@@ -52,7 +52,7 @@ class Route(base.Base):
     @classmethod
     def replace(cls, network, **kwargs):
         """ Replace command for route. """
-        cls.cache.reset()
+        cls.cache.clear()
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
         func = cls.shwrap(cls.cmd.replace, ('table', 'src', ''))

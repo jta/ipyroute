@@ -24,14 +24,14 @@ class Rule(base.Base):
 
     def add(self):
         """ Add command for address. """
-        Rule.cache.reset()
+        Rule.cache.clear()
         kwargs = dict([(k.replace('prefix', ''), str(v))
                       for (k, v) in self.__dict__.items() if v is not None])
         return self.shwrap(self.cmd.add, self._order)(**kwargs)
 
     def delete(self):
         """ Delete command for rule. """
-        Rule.cache.reset()
+        Rule.cache.clear()
         kwargs = dict([(k.replace('prefix', ''), str(v))
                       for (k, v) in self.__dict__.items() if v is not None])
         return self.shwrap(getattr(self.cmd, 'del'), self._order)(**kwargs)

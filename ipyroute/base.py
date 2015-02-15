@@ -63,10 +63,9 @@ class Cache(dict):
     def __contains__(self, key):
         return key in self._time and time.time() < self._time[key] + self._timeout
 
-    def reset(self):
-        for key in self.keys():
-            del self._time[key]
-            del self[key]
+    def clear(self):
+        super(Cache, self).clear()
+        self._time.clear()
 
 
 # pylint: disable=invalid-name
