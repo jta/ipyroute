@@ -36,15 +36,18 @@ class Neighbor(base.Base):
     @base.classproperty
     def add(cls):
         """ Add command for address. """
+        cls.cache.reset()
         return cls.shwrap(cls.cmd.add, cls._order)
 
     @base.classproperty
     def replace(cls):
         """ Add command for address. """
+        cls.cache.reset()
         return cls.shwrap(cls.cmd.replace, cls._order)
 
     @base.classproperty
     def delete(cls):
         """ Add command for address. """
+        cls.cache.reset()
         return cls.shwrap(getattr(cls.cmd, 'del'), cls._order)
 

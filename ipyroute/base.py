@@ -6,6 +6,7 @@ import functools
 import netaddr
 import re
 import sys
+import time
 
 from sh import ErrorReturnCode
 
@@ -49,6 +50,25 @@ class IPR(object):
     _ipr = None
 
 
+class Cache(dict):
+    """ Cache dictionary with timeout for storing results of iproute show. """
+    def __init__(self, timeout=0):
+        self._timeout = timeout
+        self._time = {}
+
+    def __setitem__(self, key, val):
+        super(Cache, self).__setitem__(key, val)
+        self._time[key] = time.time()
+
+    def __contains__(self, key):
+        return key in self._time and time.time() < self._time[key] + self._timeout
+
+    def reset(self):
+        for key in self.keys():
+            del self._time[key]
+            del self[key]
+
+
 # pylint: disable=invalid-name
 class classproperty(property):
     """ A hack to do classmethod properties. Normally you'd just use class attributes,
@@ -68,6 +88,7 @@ class Base(object):
     """
     regex = re.compile(r'')
     casts = dict()
+    cache = Cache(0)
 
     def __init__(self, **kwargs):
         """ We receive a dict of key/value pairs, which we should set as object
@@ -110,7 +131,7 @@ class Base(object):
         """ Flatten list of args and kwargs into single list of args.
             This is used to build command for iproute2.
         """
-        return list(args) + [i for kv in kwargs.items() for i in kv]
+        return tuple(list(args) + [i for kv in kwargs.items() for i in kv])
 
     @staticmethod
     def shwrap(func, order):
@@ -132,6 +153,7 @@ class Base(object):
             # remaining kwargs are unordered
             for item in kwargs.items():
                 args.extend(item)
+
             return func(*args)
         return wrapped
 
@@ -141,9 +163,17 @@ class Base(object):
         """ Scrape iproute2 output and return filtered list of matches. """
         filt = kwargs.pop('filt', lambda x: True)
         args = cls._unwind(*args, **kwargs)
+
+        if cls.cache and args in cls.cache:
+            return cls.cache[args][:]
+
         func = functools.partial(cls._get, *args) if args else cls._get
         iterator = (cls.from_string(l, *args) for l in func())
-        return [i for i in iterator if filt(i)]
+        result = [i for i in iterator if filt(i)]
+        if cls.cache is not None:
+            # save copy in cache.
+            cls.cache[args] = result[:]
+        return result
 
     def __getattr__(self, name):
         """ Check for missing attributes. Override in subclass. """
@@ -157,3 +187,11 @@ class Base(object):
         if not other:
             return False
         return self.__str__() == other.__str__()
+
+    @classmethod
+    def set_cache(cls, timeout = 0):
+        """ Cache show results."""
+        cls.cache = Cache(timeout)
+
+
+

@@ -167,13 +167,13 @@ class TestAddress(unittest.TestCase):
         assert v4addr.brd is None
         assert v4addr.global_scope
 
-        assert v6addr.addr == ipyroute.IPNetwork("2620:11a:c000:2:40:ff:fe27:301")
+        assert v6addr.addr == ipyroute.IPNetwork("2620:11a:c000:2:40:ff:fe27:301/64")
         assert v6addr.label is None
         assert v6addr.ifname == "p1p3"
         assert v6addr.ifnum == 9
         assert v6addr.peer is None
         assert v6addr.brd is None
-        assert v6addr.link_scope
+        assert v6addr.global_scope
 
     def test_add_address(self):
         """ Confirm correct args get passed when adding a virtual link. """
@@ -300,4 +300,51 @@ class TestRule(unittest.TestCase):
         rule = ipyroute.Rule4.get().pop()
         assert rule.fwmark == 7
 
+class TestLinkAux(unittest.TestCase):
+    """ Test auxiliary functions on Link object to add addresses and ARP/ND neighbors. """
+    def setUp(self):
+        ipyroute.base.IPR = mock.Mock()
+
+    def tearDown(self):
+        pass
+
+    @mocked("link.link.show",
+            "8: p3p1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP qlen 1000\    link/ether 02:40:00:20:03:01 brd ff:ff:ff:ff:ff:ff")
+    @mocked("ipv4.addr.show", "8: p1p3    inet 172.16.1.1/24 brd 172.16.1.255 scope global p1p3\       valid_lft forever preferred_lft forever\n\
+8: p1p3    inet 172.16.1.1 peer 192.168.1.1/32 scope global p1p3:egress\       valid_lft forever preferred_lft forever")
+    @mocked("ipv6.addr.show", "8: p3p1    inet6 ::1/128 scope host \       valid_lft forever preferred_lft forever")
+    def test_cache_expiry(self):
+        """ Cached results should expire after fixed period. """
+        link = ipyroute.Link.get().pop()
+
+        ipyroute.Address.set_cache(0.1)
+        assert not ipyroute.base.IPR.ipv4.addr.show.call_count
+        assert ipyroute.IPNetwork('172.16.1.1/32') in link.addresses
+        assert ipyroute.base.IPR.ipv4.addr.show.call_count == 1
+        assert ipyroute.IPNetwork('192.168.1.1/32') in link.peers
+        assert ipyroute.base.IPR.ipv4.addr.show.call_count == 1
+        import time
+        time.sleep(0.1)
+        assert ipyroute.IPNetwork('192.168.1.1/32') in link.peers
+        assert ipyroute.base.IPR.ipv4.addr.show.call_count == 2
+
+    @mocked("link.link.show",
+            "8: p3p1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP qlen 1000\    link/ether 02:40:00:20:03:01 brd ff:ff:ff:ff:ff:ff")
+    @mocked("ipv4.addr.show", "8: p1p3    inet 172.16.1.1/24 brd 172.16.1.255 scope global p1p3\       valid_lft forever preferred_lft forever\n\
+8: p1p3    inet 172.16.1.1 peer 192.168.1.1/32 scope global p1p3:egress\       valid_lft forever preferred_lft forever")
+    @mocked("ipv6.addr.show", "8: p3p1    inet6 ::1/128 scope host \       valid_lft forever preferred_lft forever")
+    def test_cache_bust(self):
+        """ Cached results should be purged on applying changes. """
+        link = ipyroute.Link.get().pop()
+
+        ipyroute.Address.set_cache(1)
+        assert not ipyroute.base.IPR.ipv4.addr.show.call_count
+        assert ipyroute.IPNetwork('172.16.1.1/32') in link.addresses
+        assert ipyroute.base.IPR.ipv4.addr.show.call_count == 1
+        assert ipyroute.IPNetwork('192.168.1.1/32') in link.peers
+        assert ipyroute.base.IPR.ipv4.addr.show.call_count == 1
+
+        link.add_peer(ipyroute.IPNetwork('172.16.1.1/32'), ipyroute.IPNetwork('192.16.1.2/32'))
+        assert ipyroute.IPNetwork('192.168.1.1/32') in link.peers
+        assert ipyroute.base.IPR.ipv4.addr.show.call_count == 2
 

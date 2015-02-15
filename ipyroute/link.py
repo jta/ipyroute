@@ -5,6 +5,8 @@ from __future__ import print_function
 import re
 
 from ipyroute import base
+from .address import Address
+from .neighbor import Neighbor
 
 class Link(base.Base):
     """ Interact with `ip link`. """
@@ -53,6 +55,7 @@ class Link(base.Base):
     @property
     def add(self):
         """ Add command for link. """
+        Link.cache.reset()
         func = getattr(self.cmd.add.link, self.name)
         order = ('type',  'mode')
         return self.shwrap(func.dev, order)
@@ -60,6 +63,7 @@ class Link(base.Base):
     @property
     def delete(self):
         """ Delete command for link. """
+        Link.cache.reset()
         func = getattr(self.cmd.delete, self.name)
         order = ()
         return self.shwrap(func, order)
@@ -67,6 +71,7 @@ class Link(base.Base):
     @property
     def set(self):
         """ Set command for link. """
+        Link.cache.reset()
         func = getattr(self.cmd.set.dev, self.name)
         order = ()
         return self.shwrap(func, order)
@@ -83,6 +88,35 @@ class Link(base.Base):
         elif linktype == 'gre':
             _cls = GRELink
         return _cls(**result)
+
+    @property
+    def addresses(self):
+        return set(i.addr for i in Address.get(self.name))
+
+    @property
+    def peers(self):
+        """ Return set of peeers associated to this link. """
+        return set(i.peer for i in Address.get(self.name) if i.peer)
+
+    def add_peer(self, srcip, dstip):
+        """ Add peer to interface. """
+        Address.add(srcip, peer=dstip, dev=self.name)
+
+    def del_peer(self, srcip, dstip):
+        """ Delete peer from interface. """
+        Address.delete(srcip, peer=dstip, dev=self.name)
+
+    @property
+    def neighbors(self):
+        """ Delete peer from interface. """
+        return set(i.ipaddr for i in ipyroute.Neighbor.get(self.name))
+
+    @property
+    def neighbors(self):
+        return ipyroute.Neighbor.get(self.name)
+
+
+
 
 class EtherLink(Link):
     casts = dict(addr=base.EUI, brd=base.EUI, **Link.casts)

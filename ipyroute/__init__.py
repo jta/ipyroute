@@ -7,3 +7,4 @@ from .link import Link
 from .neighbor import Neighbor
 from .route import Route4, Route6, Nexthop
 from .rule import Rule4, Rule6
+
