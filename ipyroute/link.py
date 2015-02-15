@@ -109,14 +109,15 @@ class Link(base.Base):
     @property
     def neighbors(self):
         """ Delete peer from interface. """
-        return set(i.ipaddr for i in ipyroute.Neighbor.get(self.name))
+        return set(i.ipaddr for i in Neighbor.get(self.name))
 
-    @property
-    def neighbors(self):
-        return ipyroute.Neighbor.get(self.name)
+    def add_neighbor(self, ipaddr, lladdr):
+        """ Add peer to interface. """
+        Neighbor.add(ipaddr, lladdr=lladdr, nud='permanent', dev=self.name)
 
-
-
+    def del_peer(self, srcip, dstip):
+        """ Delete peer from interface. """
+        Neighbor.delete(ipaddr, lladdr=lladdr, nud='permanent', dev=self.name)
 
 class EtherLink(Link):
     casts = dict(addr=base.EUI, brd=base.EUI, **Link.casts)
