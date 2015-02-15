@@ -109,7 +109,7 @@ class Link(base.Base):
     @property
     def neighbors(self):
         """ Delete peer from interface. """
-        return set(i.ipaddr for i in Neighbor.get(self.name))
+        return set(i.ipaddr for i in Neighbor.get(dev=self.name))
 
     def add_neighbor(self, ipaddr, lladdr):
         """ Add peer to interface. """
