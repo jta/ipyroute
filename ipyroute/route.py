@@ -25,6 +25,7 @@ class Route(base.Base):
 
     casts = dict(network=base.IPNetwork,
                  src=base.IPAddress,
+                 via=base.IPAddress,
                  metric=int,
                  mtu=int,
                  advmss=int)
