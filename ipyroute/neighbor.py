@@ -16,10 +16,12 @@ class Neighbor(base.Base):
     @classmethod
     def _get(cls, *args):
         """ Return neighbors. """
-        for line in base.IPR.ipv4.neigh.show(*args):
-            yield line
-        for line in base.IPR.ipv6.neigh.show(*args):
-            yield line
+        for version in (base.IPR.ipv4, base.IPR.ipv6):
+            try:
+                for line in version.neigh.show(*args):
+                    yield line
+            except:
+                pass
 
     def __getattr__(self, name):
         """ Map nud types. """
