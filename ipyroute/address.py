@@ -54,13 +54,13 @@ class Address(base.Base):
     def change(cls):
         """ Change command for address. """
         cls.cache.clear()
-        return cls.shwrap(cls.cmd.add.change, cls._order)
+        return cls.shwrap(cls.cmd.change, cls._order)
 
     @base.classproperty
     def replace(cls):
         """ Replace command for address. """
         cls.cache.clear()
-        return cls.shwrap(cls.cmd.add.replace, cls._order)
+        return cls.shwrap(cls.cmd.replace, cls._order)
 
     @base.classproperty
     def delete(cls):
