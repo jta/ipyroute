@@ -98,26 +98,49 @@ class Link(base.Base):
         """ Return set of peeers associated to this link. """
         return set(i.peer for i in Address.get(self.name) if i.peer)
 
-    def add_peer(self, srcip, dstip):
-        """ Add peer to interface. """
-        Address.add(srcip, peer=dstip, dev=self.name)
+    def _mod_peer(self, method, srcip, dstip, **kwargs):
+        method(srcip, peer=dstip, dev=self.name, **kwargs)
 
-    def del_peer(self, srcip, dstip):
+    def add_peer(self, *args, **kwargs):
+        """ Add peer to interface. """
+        self._mod_peer(Address.add, *args, **kwargs)
+
+    def replace_peer(self, *args, **kwargs):
+        """ Replace peer on interface. """
+        self._mod_peer(Address.replace, *args, **kwargs)
+
+    def del_peer(self, *args, **kwargs):
         """ Delete peer from interface. """
-        Address.delete(srcip, peer=dstip, dev=self.name)
+        self._mod_peer(Address.delete, *args, **kwargs)
+
+    def change_peer(self, *args, **kwargs):
+        """ Change peer on interface. """
+        self._mod_peer(Address.change, *args, **kwargs)
 
     @property
     def neighbors(self):
         """ Delete peer from interface. """
         return set(i.ipaddr for i in Neighbor.get(dev=self.name))
 
-    def add_neighbor(self, ipaddr, lladdr):
+    def _mod_neighbor(self, method, ipaddr, lladdr, **kwargs):
         """ Add peer to interface. """
-        Neighbor.add(ipaddr, lladdr=lladdr, nud='permanent', dev=self.name)
+        method(ipaddr, lladdr=lladdr, nud='permanent', dev=self.name, **kwargs)
 
-    def del_peer(self, srcip, dstip):
-        """ Delete peer from interface. """
-        Neighbor.delete(ipaddr, lladdr=lladdr, nud='permanent', dev=self.name)
+    def add_neighbor(self, *args, **kwargs):
+        """ Add neighbor to interface. """
+        self._mod_neighbor(Neighbor.add, *args)
+
+    def del_neighbor(self, *args, **kwargs):
+        """ Delete neighbor from interface. """
+        self._mod_neighbor(Neighbor.delete, *args)
+
+    def replace_neighbor(self, *args, **kwargs):
+        """ Replace neighbor for interface. """
+        self._mod_neighbor(Neighbor.replace, *args)
+
+    def change_neighbor(self, *args, **kwargs):
+        """ Change neighbor on interface. """
+        self._mod_neighbor(Neighbor.change, *args)
 
 class EtherLink(Link):
     casts = dict(addr=base.EUI, brd=base.EUI, **Link.casts)

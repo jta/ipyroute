@@ -16,6 +16,7 @@ class Neighbor(base.Base):
     @classmethod
     def _get(cls, *args):
         """ Return neighbors. """
+        """ Return neighbors. """
         for version in (base.IPR.ipv4, base.IPR.ipv6):
             try:
                 for line in version.neigh.show(*args):
@@ -46,6 +47,13 @@ class Neighbor(base.Base):
         """ Add command for address. """
         cls.cache.clear()
         return cls.shwrap(cls.cmd.replace, cls._order)
+
+    @base.classproperty
+    def change(cls):
+        """ Add command for address. """
+        cls.cache.clear()
+        return cls.shwrap(cls.cmd.change, cls._order)
+
 
     @base.classproperty
     def delete(cls):
