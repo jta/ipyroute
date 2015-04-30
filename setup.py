@@ -12,7 +12,7 @@ if sys.version_info < (2,5):
     raise NotImplementedError("Sorry, you need at least Python 2.5 or Python 3.x to use ipyroute.")
 
 __author__ = 'João Taveira Araújo'
-__version__ = '0.0.25'
+__version__ = '0.0.26'
 __license__ = 'MIT'
 
 setup(name='ipyroute',
