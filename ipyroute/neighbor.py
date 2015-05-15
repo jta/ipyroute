@@ -10,12 +10,11 @@ class Neighbor(base.Base):
                         '(router)?\s*(?P<nud>\S+)')
 
     casts = dict(ipaddr=base.IPAddress, ifaddr=base.EUI)
-    _validnuds = set(['REACHABLE', 'STALE', 'PERMANENT'])
+    _validnuds = set(['REACHABLE', 'STALE', 'PERMANENT', 'FAILED'])
     _order = ('lladdr', 'nud', 'proxy', 'dev')
 
     @classmethod
     def _get(cls, *args):
-        """ Return neighbors. """
         """ Return neighbors. """
         for version in (base.IPR.ipv4, base.IPR.ipv6):
             try:
