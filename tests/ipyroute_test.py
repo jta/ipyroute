@@ -41,6 +41,19 @@ class TestLink(unittest.TestCase):
         assert not link.broadcast
 
     @mocked("link.link.show",
+            "3: pimreg@NONE: <NOARP,UP,LOWER_UP> mtu 1472 qdisc noqueue state UNKNOWN \    link/pimreg ")
+    def test_no_broadcast(self):
+        """ Parse link with no broadcast address. """
+        link = ipyroute.Link.get().pop()
+        assert link.name == "pimreg"
+        assert not link.loopback
+        assert link.up
+        assert link.lower_up
+        assert link.mtu == 1472
+        assert not link.broadcast
+
+
+    @mocked("link.link.show",
             "2: bond0: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noop state DOWN \    link/ether 82:e1:10:2e:d2:bf brd ff:ff:ff:ff:ff:ff")
     def test_bond_link(self):
         """ Parse bond link. """

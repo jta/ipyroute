@@ -19,9 +19,9 @@ class Link(base.Base):
                        r'(mode (?P<mode>\S+)\s*)?'
                        r'(group (?P<group>\S+)\s*)?'
                        r'(qlen (?P<qlen>\S+)\s*)?'
-                       r'\\\s+link/(?P<type>\S+) '
-                       r'(?P<addr>[a-f\d.:]+) '
-                       r'brd (?P<brd>[a-f\d.:]+)')
+                       r'\\\s+link/(?P<type>\S+)\s*'
+                       r'((?P<addr>[a-f\d.:]+)\s*)?'
+                       r'(brd (?P<brd>[a-f\d.:]+))?')
 
     casts = dict(num=int, mtu=int)
 
