@@ -284,6 +284,23 @@ class TestRoute(unittest.TestCase):
         assert v6route.dev == 'p1p4'
         assert v6route.metric == 256
 
+    @mocked("ipv4.route.show", "local 8.8.8.8 dev lo  scope host")
+    @mocked("ipv6.route.show", "unreachable fe80::/64 dev p1p4  proto kernel  metric 256 error -101")
+    def test_route_types(self):
+        """ Parse route types. """
+        v4route, = ipyroute.Route4.get()
+        assert v4route.is_local
+        assert v4route.network == ipyroute.IPNetwork('8.8.8.8/32')
+        assert v4route.dev == "lo"
+
+        v6route, = ipyroute.Route6.get()
+        assert v6route.is_unreachable
+        assert v6route.network == ipyroute.IPNetwork('fe80::/64')
+        assert v6route.dev == "p1p4"
+        assert v6route.proto == "kernel"
+        assert v6route.metric == 256
+        assert v6route.error == -101
+
 
 class TestRule(unittest.TestCase):
     """ Test rule lib. """

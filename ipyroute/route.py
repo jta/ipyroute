@@ -14,21 +14,34 @@ class Nexthop(base.Base):
 
 
 class Route(base.Base):
-    regex = re.compile(r'(?P<network>\S+)\s+'
+    types = ('unicast',
+             'local',
+             'broadcast',
+             'multicast',
+             'throw',
+             'unreachable',
+             'prohibit',
+             'blackhole',
+             'nat')
+
+    regex = re.compile(r'((?P<type>('+'|'.join(types)+'))\s+)?'
+                       r'(?P<network>\S+)\s+'
                        r'(via (?P<via>\S+)\s*)?'
                        r'(dev (?P<dev>\S+)\s*)?'
                        r'(proto (?P<proto>\S+)\s*)?'
                        r'(src (?P<src>\S+)\s*)?'
                        r'(metric (?P<metric>\d+)\s*)?'
                        r'(mtu (?P<mtu>\d+)\s*)?'
-                       r'(advmss (?P<advmss>\d+)\s*)?')
+                       r'(advmss (?P<advmss>\d+)\s*)?'
+                       r'(error (?P<error>-?\d+)\s*)?')
 
     casts = dict(network=base.IPNetwork,
                  src=base.IPAddress,
                  via=base.IPAddress,
                  metric=int,
                  mtu=int,
-                 advmss=int)
+                 advmss=int,
+                 error=int)
 
     @classmethod
     def _get(cls, *args):
@@ -81,6 +94,12 @@ class Route(base.Base):
     def __hash__(self):
         """ Needed for constructing sets. """
         return self.network
+
+    def __getattr__(self, name):
+        if not name.startswith('is_'):
+            return super(Route, self).__getattr__(name)
+        return self.type is not None and self.type == name[3:]
+
 
 class Route4(Route):
     anyaddr = "0.0.0.0/0"
