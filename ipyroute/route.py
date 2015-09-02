@@ -61,6 +61,19 @@ class Route(base.Base):
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
         func = cls.shwrap(cls.cmd.add, ('table', 'src', ''))
+        if 'type' in kwargs:
+            func = functools.partial(func, kwargs.pop('type'))
+        return func(network, **kwargs)
+
+    @classmethod
+    def delete(cls, network, **kwargs):
+        """ Add command for route. """
+        cls.cache.clear()
+        if 'nexthops' in kwargs:
+            kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
+        func = cls.shwrap(cls.cmd.delete, ('table', 'src', ''))
+        if 'type' in kwargs:
+            func = functools.partial(func, kwargs.pop('type'))
         return func(network, **kwargs)
 
     @classmethod
@@ -70,6 +83,8 @@ class Route(base.Base):
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
         func = cls.shwrap(cls.cmd.replace, ('table', 'src', ''))
+        if 'type' in kwargs:
+            func = functools.partial(func, kwargs.pop('type'))
         return func(network, **kwargs)
 
     @classmethod
