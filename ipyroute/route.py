@@ -58,7 +58,7 @@ class Route(base.Base):
     def add(cls, network, **kwargs):
         """ Add command for route. """
         cls.cache.clear()
-        kwargs = dict((k, v) for k, v in kwargs if v is not None)
+        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
         func = cls.shwrap(cls.cmd.add, ('table', 'src', ''))
