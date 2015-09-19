@@ -20,6 +20,12 @@ You can pass a function into `get` to filter out results:
 {'qlen': None, 'qdisc': u'noqueue', 'group': u'default', 'name': u'lo', 'phy': None, 'mtu': 65536, 'state': u'UNKNOWN', 'num': 1, 'flags': u'LOOPBACK,UP,LOWER_UP', 'mode': u'DEFAULT', 'brd': u'00:00:00:00:00:00', 'type': u'loopback', 'addr': u'00:00:00:00:00:00'}`
 ```
 
+You can also pass arguments to set in the relevant iproute2 call:
+
+```
+>>> ipyroute.Link.get(group=1)
+```
+
 From the link object, you should be able to retrieve the relevant set of addresses and neighbors:
 
 ```
