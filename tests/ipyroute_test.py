@@ -61,7 +61,7 @@ class TestLink(unittest.TestCase):
         assert link.name == "bond0"
         assert link.broadcast
         assert link.multicast
-        assert link.master
+        assert link.is_master
         assert link.mtu == 1500
         assert link.qdisc == 'noop'
         assert link.type == 'ether'
@@ -75,7 +75,7 @@ class TestLink(unittest.TestCase):
         assert link.name == "dummy0"
         assert link.broadcast
         assert link.noarp
-        assert not link.master
+        assert not link.is_master
         assert link.mtu == 1500
         assert link.addr == ipyroute.EUI('c2:9a:cc:30:2c:67')
         assert link.brd == ipyroute.EUI('ff:ff:ff:ff:ff:ff')
@@ -134,6 +134,15 @@ class TestLink(unittest.TestCase):
         link = ipyroute.Link.get(group='test').pop()
         assert link.group == 'test'
 
+
+    @mocked("link.link.show",
+            "11: lxcbr0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP \    link/ether 75:27:76:9b:53:52 brd ff:ff:ff:ff:ff:ff\n\
+13: vethpT29kH: <BROADCAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master lxcbr0 state UP qlen 1000\    link/ether f1:7c:3b:de:49:81 brd 00:00:00:00:00:00")
+    def test_link_virbr(self):
+        """ Parse link for specific link example. """
+        master, slave = ipyroute.Link.get()
+        assert master.broadcast
+        assert slave.master == master.name
 
 
 class TestAddress(unittest.TestCase):

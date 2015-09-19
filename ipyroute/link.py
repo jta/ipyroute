@@ -15,6 +15,7 @@ class Link(base.Base):
                        r'<(?P<flags>\S+)> '
                        r'(mtu (?P<mtu>\d+)\s*)?'
                        r'(qdisc (?P<qdisc>\S+)\s*)?'
+                       r'(master (?P<master>\S+)\s*)?'
                        r'(state (?P<state>\S+)\s*)?'
                        r'(mode (?P<mode>\S+)\s*)?'
                        r'(group (?P<group>\S+)\s*)?'
@@ -27,7 +28,8 @@ class Link(base.Base):
 
     _validflags = set(['UP', 'LOWER_UP', 'LOOPBACK', 'BROADCAST',
                        'POINTTOPOINT', 'MULTICAST', 'PROMISC',
-                       'ALLMULTI', 'NOARP', 'DYNAMIC', 'MASTER', 'SLAVE'])
+                       'ALLMULTI', 'NOARP', 'DYNAMIC'])
+    _validassoc = set(['MASTER', 'SLAVE'])
 
     @classmethod
     def _get(cls, *args):
@@ -44,6 +46,8 @@ class Link(base.Base):
 
         if name.upper() in self._validflags:
             return name.upper() in self.flags
+        elif name.startswith('is_') and name[3:].upper() in self._validassoc:
+            return name[3:].upper() in self.flags
         super(Link, self).__getattr__(name)
 
     @base.classproperty
