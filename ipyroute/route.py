@@ -61,7 +61,7 @@ class Route(base.Base):
         kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
-        func = cls.shwrap(cls.cmd.add, ('table', 'src', ''))
+        func = cls.shwrap(cls.cmd.add, ('table', 'src', 'advmss', 'mtu', ''))
         if 'type' in kwargs:
             func = functools.partial(func, kwargs.pop('type'))
         return func(network, **kwargs)
@@ -72,7 +72,7 @@ class Route(base.Base):
         cls.cache.clear()
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
-        func = cls.shwrap(cls.cmd.delete, ('table', 'src', ''))
+        func = cls.shwrap(cls.cmd.delete, ('table', 'src', 'advmss', 'mtu', ''))
         if 'type' in kwargs:
             func = functools.partial(func, kwargs.pop('type'))
         return func(network, **kwargs)
@@ -83,7 +83,7 @@ class Route(base.Base):
         cls.cache.clear()
         if 'nexthops' in kwargs:
             kwargs[''] = cls._convert_nexthops(kwargs.pop('nexthops'))
-        func = cls.shwrap(cls.cmd.replace, ('table', 'src', ''))
+        func = cls.shwrap(cls.cmd.replace, ('table', 'src', 'advmss', 'mtu', ''))
         if 'type' in kwargs:
             func = functools.partial(func, kwargs.pop('type'))
         return func(network, **kwargs)
