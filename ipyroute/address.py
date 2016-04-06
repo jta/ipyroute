@@ -10,6 +10,7 @@ class Address(base.Base):
                        r'(brd (?P<brd>\S+))?\s?'
                        r'(peer (?P<peer>\S+))?\s?'
                        r'scope (?P<scope>\S+) '
+                       r'(mngtmpaddr (?P<mngtmpaddr>\S+))?\s?'
                        r'(?P=ifname)?((:(?P<label>[^\\]+)))?')
 
 
