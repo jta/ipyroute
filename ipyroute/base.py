@@ -147,7 +147,7 @@ class Base(object):
                     value = kwargs.pop(key)
                     if isinstance(value, (list, tuple)):
                         args.extend(value)
-                    else:
+                    elif not isinstance(value, bool):
                         args.append(value)
             # remaining kwargs are unordered
             for item in kwargs.items():

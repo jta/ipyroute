@@ -5,19 +5,21 @@ from ipyroute import base
 
 class Rule(base.Base):
     regex = re.compile(r'(?P<pref>\d+):\s+'
+                       r'((?P<_not>not)\s+)?'
                        r'(from (?P<fromprefix>\w+)\s+)?'
                        r'(to (?P<toprefix>\w+)\s+)?'
                        r'(fwmark (?P<fwmark>\w+)\s+)?'
                        r'(iif (?P<iif>\w+)\s+)?'
                        r'(lookup (?P<lookup>\w+))?')
 
-    casts = dict(pref=int,
+    casts = dict(_not=bool,
+                 pref=int,
                  fwmark=lambda x: int(x, 16) if isinstance(x, six.string_types) and 'x' in x else int(x),
                  lookup=unicode if not six.PY3 else lambda x: x,
                  fromprefix=base.IPNetwork,
                  toprefix=base.IPNetwork,
                  iif=unicode if not six.PY3 else lambda x: x)
-    _order = ('from', 'fwmark', 'lookup', 'iif', 'pref')
+    _order = ('not', 'from', 'fwmark', 'lookup', 'iif', 'pref')
 
     @classmethod
     def _get(cls, *args):
@@ -27,14 +29,14 @@ class Rule(base.Base):
     def add(self):
         """ Add command for address. """
         Rule.cache.clear()
-        kwargs = dict([(k.replace('prefix', ''), str(v))
+        kwargs = dict([(k.replace('_', '').replace('prefix', ''), str(v) if not isinstance(v, bool) else v)
                       for (k, v) in self.__dict__.items() if v is not None])
         return self.shwrap(self.cmd.add, self._order)(**kwargs)
 
     def delete(self):
         """ Delete command for rule. """
         Rule.cache.clear()
-        kwargs = dict([(k.replace('prefix', ''), str(v))
+        kwargs = dict([(k.replace('_', '').replace('prefix', ''), str(v) if not isinstance(v, bool) else v)
                       for (k, v) in self.__dict__.items() if v is not None])
         return self.shwrap(getattr(self.cmd, 'del'), self._order)(**kwargs)
 
